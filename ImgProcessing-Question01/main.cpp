@@ -69,15 +69,36 @@ int main(int argc, char ** argv) {
     //Write to csv file
     fstream outputFile1, outputFile2;
     
-    outputFile1.open( "features0001.csv", std::ios::out );
+    outputFile1.open( "features0001.csv", ios::out );
     for( size_t ii = 0; ii < keypoints_1.size( ); ++ii )
         outputFile1 << keypoints_1[ii].pt.x << " " << keypoints_1[ii].pt.y <<std::endl;
     outputFile1.close();
     
-    outputFile2.open( "features0199.csv", std::ios::out );
+    outputFile2.open( "features0199.csv", ios::out );
     for( size_t ii = 0; ii < keypoints_2.size( ); ++ii )
         outputFile2 << keypoints_2[ii].pt.x << " " << keypoints_2[ii].pt.y <<std::endl;
     outputFile2.close();
+    
+    //Part 6
+    //SURF Descriptor Extractor
+    Ptr<SURF> extractor = SURF::create();
+    Mat descriptors_1, descriptors_2;
+    extractor->compute(img_1, keypoints_1, descriptors_1);
+    extractor->compute(img_2, keypoints_2, descriptors_2);
+    
+    //Part 7
+    //Matching descriptor vectors with a brute force matcher
+    BFMatcher matcher(NORM_L2);
+    vector< DMatch > matches;
+    matcher.match( descriptors_1, descriptors_2, matches );
+    
+    //Part 8
+    //Draw matches
+    Mat output_matching;
+    drawMatches( img_1, keypoints_1, image1_crop, keypoints_2, matches, output_matching );
+    imshow("Matches", output_matching );
+
+    
     waitKey(0);
     return 0;
 }
